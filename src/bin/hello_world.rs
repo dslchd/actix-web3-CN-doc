@@ -11,6 +11,9 @@ async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world Rust!")
 }
 
+#[get("/test")]
+async fn test() -> String { "Direct Response String".to_string()}
+
 #[get("/")]
 async fn other() -> impl Responder {
     HttpResponse::Ok().body("Default Other Resp")
@@ -34,6 +37,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             // v3 版本的写法
             .service(hello)
+            .service(test)
             .service(echo)
             .service(other)
         // v2 版本的写法
