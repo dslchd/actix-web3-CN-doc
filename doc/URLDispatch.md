@@ -391,7 +391,182 @@ async fn main() -> std::io::Result<()> {
 ```
 
 
+## 路径正规化并重定向(Path normalization and redirection to slash-appended routes)
+
+规范化意味着:
+* 在路径上添加斜杠
+* 用一个替换多个斜杠
+
+这样的好处是处理器能够正确的解析路径(path)并返回. 如果全部启用, 标准化条件的顺序为 1) 合并, 2) 合并且追加 3). 如果路径至少满足这些条件中
+的一个, 则它将重定向到新路径.
++
+```rust
+use actix_web::{middleware, HttpResponse};
+
+async fn index() -> HttpResponse {
+    HttpResponse::Ok().body("Hello")
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    use actix_web::{web, App, HttpServer};
+
+    HttpServer::new(|| {
+        App::new()
+            .wrap(middleware::NormalizePath::default())
+            .route("/resource/", web::to(index))
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
+上面示例中的 `//resource///` 将会被重定向为 `/resource/` . 但是不能依赖此机制来重定向 _POST_ 请求.
+
+带有斜杠的 _NOT FOUND_ 的重定向会将原POST请求转换成GET请求, 从而丢失原始请求POST中的所有数据.
+
+可以针对GET请求注册规范化的路径:
+
+```rust
+use actix_web::{get, http::Method, middleware, web, App, HttpServer};
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .wrap(middleware::NormalizePath::default())
+            .service(index)
+            .default_service(web::route().method(Method::GET))
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
+
+## 使用应用程序前缀来编写应用(Using an Application Prefix to Compose Applications)
+`web::scope()` 方法允许你设计一个指定的应用程序范围. 此范围表示资源的前缀, 前缀能附加到资源配置添加的所有资源模式中. 它可以用在将一组
+路由安装在与它包含的可被调用位置的不同地方, 同时还可以保持相同的资源名称(译者注: 很难理解, 你就当是 scope是一组路由资源的前缀就行了, 这样
+做是好管理,资源路径清晰).
+
+示例如下:
+```rust
+#[get("/show")]
+async fn show_users() -> HttpResponse {
+    HttpResponse::Ok().body("Show users")
+}
 
 
+#[get("/show/{id}")]
+async fn user_detail(path: web::Path<(u32,)>) -> HttpResponse {
+    HttpResponse::Ok().body(format!("User detail: {}", path.into_inner().0))
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new().service(
+            web::scope("/users")
+                .service(show_users)
+                .service(user_detail),
+        )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
+在上面的示例中, _show_users_ 路由的有效模式为 _/users/show_ 而不是 _/show_ 那是因为应用程序作用域(scope)会在该模式之前. 然后, 仅仅
+当URL路径为 _/users/show_ 时路由才会被匹配, 并组当 `HttpRequest.url_for()` 函数被调用时, 它也会生成相同路径的URL.
+
+## 自定义路由防护(Custom route guard)
+你可以将路由防护(guard)看作是一个接收请求对象引用并返回ture或者false的简单函数. 一般来说一个防护它是实现了 `guard` trait的任何对象. 
+Actix 提供了多个谓词, 你可以查看 [functions section](https://docs.rs/actix-web/3/actix_web/guard/index.html#functions) API 文档.
+
+下面是一个简单的检查一个请求中是否包含指定 header 的防护示例:
+```rust
+use actix_web::{dev::RequestHead, guard::Guard, http, HttpResponse};
+
+struct ContentTypeHeader;
+
+// 实现Guard 并重写了check函数
+impl Guard for ContentTypeHeader {
+    fn check(&self, req: &RequestHead) -> bool {
+        req.headers().contains_key(http::header::CONTENT_TYPE)
+    }
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    use actix_web::{web, App, HttpServer};
+
+    HttpServer::new(|| {
+        App::new().route(
+            "/",
+            web::route()
+                .guard(ContentTypeHeader) // 添加一个防护
+                .to(|| HttpResponse::Ok()),
+        )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
+在上面的示例中, 仅当请求头中包含 _CONTENT-TYPE_ 时才会调用index 处理器.
+
+防护(guard)不能够访问和修改请求对象, 但是它可以存一些额外的信息, 参考[request extensions](https://docs.rs/actix-web/3/actix_web/struct.HttpRequest.html#method.extensions)
+
+## 修改防护(guard)值(Modifying guard values)
+你可以通过将任意谓词的值包装在 `Not` 谓词中来反转其含义. 比如, 如果你想为除了 "GET" 以外的所有方法返回 "METHOD NOT ALLOWED" 响应,
+可以使用如下示例方式操作:
+```rust
+use actix_web::{guard, web, App, HttpResponse, HttpServer};
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new().route(
+            "/",
+            web::route()
+                .guard(guard::Not(guard::Get()))
+                .to(|| HttpResponse::MethodNotAllowed()),
+        )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
+如果提供的guards能匹配 `Any` guard 表示接收一个防护清单
+```
+guard::Any(guard::Get()).or(guard::Post())  // 任意的Get Post都被接受
+```
+如果要使所有提供的 guards 能匹配, 可以使用 `All` guard.
+```text
+guard::All(guard::Get()).and(guard::Header("Content-Type","plain/text")) 
+```
+(译者注: 上面的表示所有的get且header中ContentType为 "plain/text" 的请求才能接受)
+
+## 改变默认 **NOT FOUND** 响应(Changing the default NOT FOUND response)
+如果路径模式不能在路由表中发现或者资源没有匹配的路由, 那么默认的资源就会被使用. 默认的响应是 _NOT FOUND_ . 可以使用 `App::default_service()`
+方法来重写 _NOT FOUND_ 响应. 这个方法具有接受与 `App::service()` 方法的常规资源配置相同配置的功能.
+```rust
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(web::resource("/").route(web::get().to(index)))
+            .default_service(
+                web::route()
+                    .guard(guard::Not(guard::Get()))
+                    .to(|| HttpResponse::MethodNotAllowed()),
+            )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
 
 
