@@ -5,7 +5,7 @@
 查看文档 [documentation](https://docs.rs/actix-web/3/actix_web/dev/struct.HttpResponseBuilder.html) 获取类型描述.
 
 方法 `.body`, `.finish`, 和 `.json` 完成响应的创建并返回构建好的 _HttpResponse_ 实例. 如果在同一构建器实例上多次调用这些方法,
-构建器将后 panic(恐慌).
+构建器将会发生 panic(恐慌).
 
 ```rust
 use actix_web::HttpResponse;
@@ -111,7 +111,7 @@ use actix_web::{
 #[get("/")]
 async fn index() -> HttpResponse {
     HttpResponse::Ok()
-        // v- disable compression
+        // 禁用压缩
         .encoding(ContentEncoding::Identity)
         .body("data")
 }
