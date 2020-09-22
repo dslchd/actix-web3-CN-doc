@@ -1,6 +1,7 @@
-use actix_web::{HttpServer, App, HttpResponse, web, get, HttpRequest};
+use actix_web::{HttpServer, App, HttpResponse, web, get, HttpRequest, http};
 use serde::Deserialize;
-use std::ops::Index;
+use actix_web::guard::Guard;
+use actix_web::dev::RequestHead;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -11,6 +12,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new().service(
             web::scope("/users")
+                .guard(ContentTypeHeader)
+                // .guard(guard::Not(ContentTypeHeader))  // 这一句会反转guard 含义，表示所有带 Content-Type 的请求都不能过.
                 .service(show_users)
                 .service(user_detail)
                 .service(get_matches)
@@ -63,6 +66,14 @@ async fn external_resource(req: HttpRequest) -> HttpResponse {
 
     // 手动修改一下header中的内容
     HttpResponse::Ok().header("Content-Type","text/plain").body(url.into_string())
+}
+
+struct ContentTypeHeader;
+
+impl Guard for ContentTypeHeader {
+    fn check(&self, request: &RequestHead) -> bool {
+        request.headers().contains_key(http::header::CONTENT_TYPE)
+    }
 }
 
 
