@@ -1,7 +1,7 @@
 [package]
 name = "actix-web-demo3"
 version = "0.1.0"
-authors = ["dengshenglong <dslchd@@qq.com>"]
+authors = ["dslchd <dslchd@qq.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,6 +15,8 @@ actix-web = "3"
 actix-service = "1.0.6"
 actix-session = "0.4.0"
 actix-files = "0.3.0"
+actix-web-actors = "3.0.0"
+actix = "0.10.0"
 # 序列化
 serde = "1.0.116"
 serde_json = "1.0.57"
