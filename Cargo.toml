@@ -14,6 +14,7 @@ actix-web = "3"
 # 异步请求与响应操作的组合器
 actix-service = "1.0.6"
 actix-session = "0.4.0"
+actix-files = "0.3.0"
 # 序列化
 serde = "1.0.116"
 serde_json = "1.0.57"
