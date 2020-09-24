@@ -10,7 +10,7 @@ Actix-web的中间件系统允许我们在请求/响应处理时添加一些其�
 * 修改应用程序状态.
 * 访问扩展服务(redis, logging, sessions).
 
-每个 `App` , `scope`, `Resource` 都能注册中件间, 并且它以注册顺序相反的顺序来执行. 通常, 中间件是一种实现了 [Server trait](https://docs.rs/actix-web/3/actix_web/dev/trait.Service.html) 
+每个 `App` , `scope`, `Resource` 都能注册中件间, 并且它以注册顺序相反的顺序来执行. 通常, 中间件是一种实现了 [Service trait](https://docs.rs/actix-web/3/actix_web/dev/trait.Service.html) 
 和 [Transform trait](https://docs.rs/actix-web/3/actix_web/dev/trait.Transform.html) 的类型. 在trait中的每一个方法都有其默认实现.
 每一个方法能立即返回一个结果或者一个 _future_ 对象. 
 
@@ -84,7 +84,7 @@ where
 }
 ```
 
-另外对于简单的使用, 你可以使用 [wrap_fn](https://docs.rs/actix-web/3/actix_web/struct.App.html#method.wrap_fn) 来创建一个小的临时的中间件:
+另外对于简单的使用示例, 你可以使用 [wrap_fn](https://docs.rs/actix-web/3/actix_web/struct.App.html#method.wrap_fn) 来创建一个小的临时的中间件:
 
 ```rust
 use actix_service::Service;
@@ -203,7 +203,7 @@ Actix-web提供了会话管理的通用解决方案.  [actix-session](https://do
 `CookieSessionBackend` 创建的 session 仅限制用来存少于4000字节的数据, 因为payload必须适合单个cookie. 如果session包含了超过4000
 字节的数据, 就会产生一个内部服务错误.
 
-cookie可能要有签名的或者私有的安全策略. 每种都有各自的 `CookieSession` 构建函数.
+cookie可能要有签名的或者私有的安全策略. 每种都由各自的 `CookieSession` 构建函数来创建.
 
 一个签名的cookie可以被客户端查看,但不能被修改.一个私有的cookie客户端既不能修改也不可查看.
 
@@ -248,4 +248,41 @@ async fn main() -> std::io::Result<()> {
 ```
 
 ## 错误处理
+`ErrorHandlers` 中间件可以让我们为响应定制处理.
 
+为指定的状态码你可以使用 `ErrorHandlers::handler()` 方法去注册一个错误处理函数. 你可以修改现在有响应,或者创建一个全新的. 错误处理函数
+可以立即返回一个响应或者返回可以解析为响应的 future.
+
+```rust
+use actix_web::middleware::errhandlers::{ErrorHandlerResponse, ErrorHandlers};
+use actix_web::{dev, http, HttpResponse, Result};
+
+fn render_500<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerResponse<B>> {
+    res.response_mut().headers_mut().insert(
+        http::header::CONTENT_TYPE,
+        http::HeaderValue::from_static("Error"),
+    );
+    Ok(ErrorHandlerResponse::Response(res))
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    use actix_web::{web, App, HttpServer};
+
+    HttpServer::new(|| {
+        App::new()
+            .wrap(
+                ErrorHandlers::new()
+                    .handler(http::StatusCode::INTERNAL_SERVER_ERROR, render_500),
+            )
+            .service(
+                web::resource("/test")
+                    .route(web::get().to(|| HttpResponse::Ok()))
+                    .route(web::head().to(|| HttpResponse::MethodNotAllowed())),
+            )
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
+```
