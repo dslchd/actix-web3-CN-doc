@@ -1,7 +1,66 @@
-# actix-web 3.0 学习demo
+# actix-web 3.0 中文文档
 
-## 1.参考actix-web3.0 官方文档示例
-## 2.[参考文档链接](https://actix.rs/docs/)
-## 3.说明
-基本上算是翻译了官文档,但是示例并不一定和官方的相同，同一个章节使用一个源文件，并且示例是组合的，
-一个main方法包含了整个这一章节中的所有使用方法.
+## 1.说明
+基本上算是翻译了官文档,但是示例并不一定和官方的相同. 所有的示例代码都源自己官方文档中的示例,但又不完全与之
+相同.
+
+算是一边学习一边理解写出来的demo代码. 全部都能正常运行.
+
+可以使用如下命令 + 指定文件名执行并查看结果:
+
+```shell script
+cargo run --bin hello_world
+```
+
+## 2.文档索引
+### 介绍(Introduction)
+[什么是Actix(What is Actix)](doc/WhatIsActix.md)
+### 基础(Basics)
+[起步(Getting Started)](doc/GettingStarted.md)
+
+[应用(Application)](doc/Application.md)
+
+[服务器(Server)](doc/Server.md)
+
+[处理器(Handlers)](doc/Handlers.md)
+
+[提取器(Extractors)](doc/Extractors.md)
+
+### 高级(Advanced)
+[错误(Errors)](doc/Errors.md)
+
+[URL分发(URL Dispatch)](doc/URLDispatch.md)
+
+[请求(Requests)](doc/Requests.md)
+
+[响应(Responses)](doc/Responses.md)
+
+[测试(Testing)](doc/Testing.md)
+
+[中间件(Middleware)](doc/Middleware.md)
+
+[静态文件(Static Files)](doc/StaticFiles.md)
+
+### 协议(Protocols)
+[Websockets](doc/Webscokets.md)
+
+[HTTP/2](doc/HTTP2.md)
+
+## 模式(Patterns)
+[数据库(Databases)](doc/Databases.md)
+
+## 图表(Diagrams)
+[HTTP服务初始化(HTTP Server Initialization)](doc/HTTPServerInitialization.md)
+
+[链接生命周期(Connection Lifecycle)](doc/ConnectionLifecycle.md)
+
+## API文档
+[actix](https://docs.rs/actix)
+
+[actix-web](https://docs.rs/actix-web/)
+
+## 3.其它
+由于水平有限,在翻译过程中过程中难免有错误或遗漏,可以发现后及时向我提出(提 issue).
+
+希望此文档能给不想看英文原文或英文不太好的朋友, 在使用或学习 `Actix-web` 与 `Rust` 来开发Web应用时带来帮助,
+大家共同提高, 为Rust的流行作出丁点贡献.
