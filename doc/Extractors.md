@@ -174,7 +174,7 @@ async fn index(form: web::Form<FormData>) -> Result<String> {
 * [Data](https://docs.rs/actix-web/3/actix_web/web/struct.Data.html) - 如果你需要访问应用程序状态的话.
 * HttpRequest - 如果你需要访问请求, `HttpRequest`本身就是一个提取器，它返回Self.
 * String - 你可以转换一个请求的`playload`成一个`String`. 可以参考文档中的[example](https://docs.rs/actix-web/3/actix_web/trait.FromRequest.html#example-2)
-* bytes::`Bytes` - 你楞以转换一个请求的`playload`到`Bytes`中. 可以参考文档中的[example](https://docs.rs/actix-web/3/actix_web/trait.FromRequest.html#example-4)
+* bytes::`Bytes` - 你可以转换一个请求的`playload`到`Bytes`中. 可以参考文档中的[example](https://docs.rs/actix-web/3/actix_web/trait.FromRequest.html#example-4)
 * Playload - 可以访问请求中的playload. [example](https://docs.rs/actix-web/3/actix_web/web/struct.Payload.html)
 
 ## 应用程序状态提取器(Application state extractor)
