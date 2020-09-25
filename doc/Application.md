@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()> {
 
 ## 共享可变状态(Shared Mutable State)
 `HttpServer` 接收一个应用程序工厂而不是一个应用程序实例, 一个 `HttpServer` 为每一个线程构造一个应用程序实例.
-因此必须多次构造应用程序数据,如果你想在两个不同的线程之间共享数据,一个可以共享的对象可以使用比如: ``Sync + Send`.
+因此必须多次构造应用程序数据,如果你想在两个不同的线程之间共享数据,一个可以共享的对象可以使用比如: `Sync + Send`.
 
 内部 `web::Data` 使用 `Arc`. 因此为了避免创建两个 `Arc`， 我们应该在在使用 `App::app_data()` 之前创建好我们的数据.
 
@@ -142,7 +142,7 @@ URL路径.
 其实"防护"(guards)可以是说是actix-web为handler函数提供的一种安全配置.
 
 你可以将防护看成一个接收请求对象引用并返回ture或者false的简单函数. 可以说guard是实现了Guard trait的任何对象. `actix-web` 提供了几种开箱即用的 `guards`.
-你可以查看 [functions section](https://docs.rs/actix-web/3/actix_web/guard/index.html#functions)API文档.
+你可以查看 [functions section](https://docs.rs/actix-web/3/actix_web/guard/index.html#functions) API文档.
 
 其中一个guards就是 `Header`. 它可以被用在请求头信息的过滤.
 ```rust
