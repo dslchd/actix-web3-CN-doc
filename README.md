@@ -13,6 +13,8 @@ cargo run --bin hello_world
 
 ## 2.文档索引
 ### 介绍(Introduction)
+[欢迎(Welcome)](doc/WelcomeToActix.md)
+
 [什么是Actix(What is Actix)](doc/WhatIsActix.md)
 ### 基础(Basics)
 [起步(Getting Started)](doc/GettingStarted.md)
