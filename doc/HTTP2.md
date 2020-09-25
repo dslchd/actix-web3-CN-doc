@@ -1,5 +1,5 @@
 ## HTTP2.0
-如果有可能 `actix-we` 会自动的将链接升级成 _HTTP/2_ .
+如果有可能 `actix-web` 会自动的将链接升级成 _HTTP/2_ .
 
 ## Negotiation
 _HTTP/2_ 协议是基于TLS的且需要 [TLS ALPN](https://tools.ietf.org/html/rfc7301).
