@@ -133,7 +133,7 @@ foo/abc/def     -> Params {'baz': 'abc', 'bar':'def'}
 foo/1/2/         -> Not match(trailing slash) (不匹配最后面一个斜杠)
 bar/abc/def      -> First segment literal mismatch (第一个字段就不匹配)
 ```
-字面路径 _/foo/biz.html 将和上面的路由模式匹配,且匹配的结果j  `Params{'name': 'biz' }`. 但是字面路径 _/foo/biz_ 不会被匹配,
+字面路径 _/foo/biz.html_ 将和上面的路由模式匹配,且匹配的结果 `Params{'name': 'biz' }`. 但是字面路径 _/foo/biz_ 不会被匹配,
 是因为它由{name}.html表示的字段末尾不包含文字 _.html_ (因为它仅仅包含biz. 而不是biz.html).
 
 为了要捕获两个分段, 可以使用两个替换标志符:
@@ -185,7 +185,7 @@ foo/abc/def/a/b/c       -> Params: { 'bar':u'abc', 'tail':'def/a/b/c' }
 ```
 
 ## 范围路由(Scoping Routes)
-范围的界定可以帮助你组织共享跟帖的根路径. 你可以潜逃范围(scopes).
+范围的界定可以帮助你组织共享路由的根路径. 你也可以嵌套范围(scopes).
 
 假设你要组织 "Users" 的端点路径. 这样的路径可能包含:
 * /users
