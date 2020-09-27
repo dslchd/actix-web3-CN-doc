@@ -85,7 +85,7 @@ async fn main() {
 在某些情况下,可以使用更加有效的锁策略来减少这种 "性能成本", 举个例子,可以使用读写锁 [read/write locks](https://doc.rust-lang.org/std/sync/struct.RwLock.html) 
 来代替排它锁 [mutex](https://doc.rust-lang.org/std/sync/struct.Mutex.html) 来实现互斥性,但是性能最高的情况下,还是不要使用任何锁.
 
-因为每一个worker线程是按顺序处理请求的,所以处理程序阻塞当前线程,并会停止处理新的请求.
+因为每一个worker线程是按顺序处理请求的,所以当处理程序阻塞当前线程时,会停止处理新的请求.
 
 ```rust
 fn my_handler() -> impl Responder {
@@ -142,7 +142,7 @@ async fn main() -> std::io::Result<()> {
 }
 ```
 
-**注意:** HTTP2.0需要 [tls alpn](https://tools.ietf.org/html/rfc7301) 来支持, 目前仅仅只有 `openssl` 和 `alpn` 支持.
+**注意:** HTTP2.0需要 [tls alpn](https://tools.ietf.org/html/rfc7301) 来支持, 目前仅仅只有 `openssl` 支持 `alpn`.
 更多的示例可以参考 [examples/openssl](https://github.com/actix/examples/blob/master/openssl) .
 
 为了创建生成key.pem与cert.pem,可以使用如下示例命令. **其它需要修改的地方请填写自己的主题**

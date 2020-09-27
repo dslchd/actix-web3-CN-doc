@@ -34,7 +34,7 @@ fn insert_new_user(db: &SqliteConnection, user: CreateUser) -> Result<User, Erro
 }
 ```
 
-现在你应该使用例如像 `r2db` 这样的包来设置数据库链接池, 这将使你的应用程序有许多数据库链接可用. 这也意味着多个处理函数可以同时操作数据库,
+现在你应该使用例如像 `r2d2` 这样的包来设置数据库链接池, 这将使你的应用程序有许多数据库链接可用. 这也意味着多个处理函数可以同时操作数据库,
 并且还能够接收新的链接. 简单的来说链接池是应用程序状态. 在这种情况下最好不要使用状态包装结构体(struct), 因为在池中会共享访问.
 
 ```rust
@@ -42,12 +42,12 @@ type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    // Create connection pool
+    // 创建链接池
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
 
-    // Start HTTP server
+    // 启动HTTP服务
     HttpServer::new(move || {
         App::new::data(pool.clone())
             .resource("/{name}", web::get().to(index))
