@@ -340,7 +340,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-web-demo3"
+name = "actix-web3-CN-doc"
 version = "0.1.0"
 dependencies = [
  "actix",
