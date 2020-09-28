@@ -1,4 +1,4 @@
-use actix_web::{HttpServer, App, HttpResponse, web, get, HttpRequest, http};
+use actix_web::{HttpServer, App, HttpResponse, web, get, HttpRequest, http, middleware};
 use serde::Deserialize;
 use actix_web::guard::Guard;
 use actix_web::dev::RequestHead;
@@ -12,6 +12,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new().service(
             web::scope("/users")
+                // 路径规范化默认情况下会，总是在path尾部添加一个 /
+                // 这意味着不管是使用声明式宏,还是手动.route()方式注册的 path都要以 / 结尾
+                // 否则将不能访问, 但Client 请求path /user/show/ 或 /user/show 都可以
+                // 甚至你的 path = /users//show/// 都能正常访问, 这就是NormalizePath的优点
+                .wrap(middleware::NormalizePath::default())
                 .guard(ContentTypeHeader)
                 // .guard(guard::Not(ContentTypeHeader))  // 这一句会反转guard 含义，表示所有带 Content-Type 的请求都不能过.
                 .service(show_users)
@@ -25,17 +30,17 @@ async fn main() -> std::io::Result<()> {
 }
 
 
-#[get("/show")]
+#[get("/show/")]
 async fn show_users() -> HttpResponse {
     HttpResponse::Ok().body("show_users")
 }
 
-#[get("/show/{id}")]
+#[get("/show/{id}/")]
 async fn user_detail(path: web::Path<(u32, )>) -> HttpResponse {
     HttpResponse::Ok().body(format!("User detail: {}", path.into_inner().0))
 }
 
-#[get("/matcher/{v1}/{v2}")]
+#[get("/matcher/{v1}/{v2}/")]
 async fn get_matches(req: HttpRequest) -> String {
     // 直接根据替换表达式名获取一个值
     let v1:u8 = req.match_info().get("v1").unwrap().parse().unwrap();
@@ -53,7 +58,7 @@ struct Info {
     username: String,
 }
 
-#[get("/{username}/index.html")]
+#[get("/{username}/index.html/")]
 async fn get_username(data: web::Path<Info>) -> String {
     format!("{}", data.username)
 }
