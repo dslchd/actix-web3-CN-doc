@@ -50,7 +50,7 @@ cargo run --bin hello_world
 ## 模式(Patterns)
 [数据库(Databases)](doc/Databases.md)
 
-## 图表(Diagrams)
+## 图解(Diagrams)
 [HTTP服务初始化(HTTP Server Initialization)](doc/HTTPServerInitialization.md)
 
 [链接生命周期(Connection Lifecycle)](doc/ConnectionLifecycle.md)
