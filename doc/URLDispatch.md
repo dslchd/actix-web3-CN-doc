@@ -397,9 +397,8 @@ async fn main() -> std::io::Result<()> {
 * 在路径上添加斜杠
 * 用一个替换多个斜杠
 
-这样的好处是处理器能够正确的解析路径(path)并返回. 如果全部启用, 标准化条件的顺序为 1) 合并, 2) 合并且追加 3). 如果路径至少满足这些条件中
+这样的好处是处理器能够正确的解析路径(path)并返回. 如果全部启用, 规范化条件的顺序为 1) 合并, 2) 合并且追加 3). 如果路径至少满足这些条件中
 的一个, 则它将重定向到新路径.
-+
 ```rust
 use actix_web::{middleware, HttpResponse};
 
@@ -421,11 +420,13 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 ```
-上面示例中的 `//resource///` 将会被重定向为 `/resource/` . 但是不能依赖此机制来重定向 _POST_ 请求.
+上面示例中的 `//resource///` 将会被重定向为 `/resource/` . 
+
+在上面的示例中, 为所有方法(译者注: 指GET/POST/DELETE/PUT/HEAD等)注册了路径规范化处理函数,但是不能依赖此机制来重定向 _POST_ 请求.
 
 带有斜杠的 _NOT FOUND_ 的重定向会将原POST请求转换成GET请求, 从而丢失原始请求POST中的所有数据.
 
-可以针对GET请求注册规范化的路径:
+可以仅仅针对GET请求注册规范化的路径:
 
 ```rust
 use actix_web::{get, http::Method, middleware, web, App, HttpServer};
@@ -434,7 +435,7 @@ use actix_web::{get, http::Method, middleware, web, App, HttpServer};
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .wrap(middleware::NormalizePath::default())
+            .wrap(middleware::NormalizePath::default()) 
             .service(index)
             .default_service(web::route().method(Method::GET))
     })
@@ -445,7 +446,7 @@ async fn main() -> std::io::Result<()> {
 ```
 
 ## 使用应用程序前缀来编写应用(Using an Application Prefix to Compose Applications)
-`web::scope()` 方法允许你设计一个指定的应用程序范围. 此范围表示资源的前缀, 前缀能附加到资源配置添加的所有资源模式中. 它可以用在将一组
+`web::scope()` 方法允许你设置一个指定的应用程序范围. 此范围表示资源的前缀, 前缀能附加到资源配置添加的所有资源模式中. 它可以用在将一组
 路由安装在与它包含的可被调用位置的不同地方, 同时还可以保持相同的资源名称(译者注: 很难理解, 你就当是 scope是一组路由资源的前缀就行了, 这样
 做是好管理,资源路径清晰).
 
