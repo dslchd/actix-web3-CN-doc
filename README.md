@@ -11,6 +11,9 @@
 cargo run --bin hello_world
 ```
 
+**另外:** `Actix-Web` 的网络部分是基于[Tokio](https://tokio.rs/tokio/tutorial) 来实现的. 因此要想更加深入的了解`Actix-web`的实现细节, `Tokio`是你
+必须要学习和了解的框架. `Tokio` 的中文文档指南请参考: [这里](https://github.com/dslchd/tokio-cn-doc).
+
 ## 2.文档索引
 ### 介绍(Introduction)
 [欢迎(Welcome)](doc/WelcomeToActix.md)
