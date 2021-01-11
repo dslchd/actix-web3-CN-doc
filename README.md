@@ -51,6 +51,8 @@ cargo run --bin hello_world
 [HTTP/2](doc/HTTP2.md)
 
 ## 模式(Patterns)
+[自动重载(Auto-Reloading)](doc/AutoReloading.md)
+
 [数据库(Databases)](doc/Databases.md)
 
 ## 图解(Diagrams)
